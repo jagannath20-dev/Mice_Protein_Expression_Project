@@ -18,7 +18,7 @@ def get_requirements()->List[str]:
 
 
 setup(
-    name="sensor",
+    name="Mice",
     version="0.0.2",
     author="Devarakonda Jagannath",
     author_email="devarakondajagannath6378@gmail.com",
