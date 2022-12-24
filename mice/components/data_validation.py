@@ -66,7 +66,7 @@ class DataValidation:
             missing_columns = []
             for base_column in base_columns:
                 if base_column not in current_columns:
-                    logging.info(f"Column: [{base} is not available.]")
+                    logging.info(f"Column: [{base_df} is not available.]")
                     missing_columns.append(base_column)
 
 
@@ -91,7 +91,7 @@ class DataValidation:
                 # Null Hypothesis is that both column data drawn from same distribution
 
                 logging.info(f"Hypothesis is {base_column} : {base_data.dtype}, {current_data.dtype} ")
-                same_distribution= ks_2samp(base_data,cuurent_data)
+                same_distribution= ks_2samp(base_data,current_data)
 
                 if same_distribution.pvalue>0.05:
                     #We are accepting null Hypothesis
@@ -129,23 +129,24 @@ class DataValidation:
 
 
             exclude_columns = [TARGET_COLUMN]
+
             base_df = utils.convert_columns_float(df=base_df, exclude_columns=exclude_columns)
             train_df = utils.convert_columns_float(df =train_df,exclude_columns=exclude_columns)
             test_df = utils.convert_columns_float(df = test_df, exclude_columns = exclude_columns)
 
             logging.info(f"Is all required columns present in train df")
-            train_df_columns_status = self.is_required_columns_exists(base_df=base_df,current_df=train_df,report_key_name="missing_columns_within_train_dataset")
+            train_df_column_status = self.is_required_columns_exists(base_df=base_df,current_df=train_df, report_key_name="missing_columns_within_train_dataset")
             logging.info(f"Is all required columns present in test df")
-            test_df_columns_status = self.is_required_columns_exists(base_df=base_df,current_df=test_df,report_key_name="missing_columns_within_test_dataset")
+            test_df_column_status = self.is_required_columns_exists(base_df=base_df,current_df=test_df,report_key_name="missing_columns_within_test_dataset")
 
-            if train_df_columns_status:
+            if train_df_column_status:
                 logging.info(f"As all column are available in train df hence detecting data drift")
                 self.data_drift(base_df=base_df, current_df=train_df,report_key_name="data_drift_within_train_dataset")
-            if test_df_columns_status:
+            if test_df_column_status:
                 logging.info(f"As all column are available in test df hence detecting data drift")
                 self.data_drift(base_df=base_df, current_df=test_df,report_key_name="data_drift_within_test_dataset")
 
-            #write the report
+            # Write the report
             logging.info("Write reprt in yaml file")
             utils.write_yaml_file(file_path=self.data_validation_config.report_file_path,
             data=self.validation_error)
