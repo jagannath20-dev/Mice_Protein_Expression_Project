@@ -43,7 +43,7 @@ def convert_columns_float(df:pd.DataFrame,exclude_columns:list)->pd.DataFrame:
     try:
         for column in df.columns:
             if column not in exclude_columns:
-                df[column]=df[column].astype('float')
+                df[column]=df[column].astype('string')
         return df
     except Exception as e:
         raise MiceException(e,sys)

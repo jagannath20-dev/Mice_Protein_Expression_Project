@@ -7,6 +7,7 @@ from mice import utils
 import os, sys
 from scipy.stats import ks_2samp
 from typing import Optional
+from mice.config import TARGET_COLUMN
 
 
 class DataValidation:
@@ -114,7 +115,7 @@ class DataValidation:
             base_df.replace({"na" :np.NAN},inplace = True)
             logging.info(f"Replace na value in base df")
             logging.info(f"Drop null values columns from base df")
-            base_df = self.drop_missing_value_columns( df = base_Df, report_key_name = "missing_values_within_base_dataset")
+            base_df = self.drop_missing_value_columns( df = base_df, report_key_name = "missing_values_within_base_dataset")
 
             logging.info(f"Reading train dataframe")
             train_df = pd.read_csv(self.data_ingestion_artifact.train_file_path)
@@ -133,14 +134,9 @@ class DataValidation:
             test_df = utils.convert_columns_float(df = test_df, exclude_columns = exclude_columns)
 
             logging.info(f"Is all required columns present in train df")
-            train_df_column_status = self.is_required_columns_exists(base_df = base_df,
-            current_df = train_df,
-            report_key_name = "missing_columns_within_train_dataset")
-
+            train_df_columns_status = self.is_required_columns_exists(base_df=base_df,current_df=train_df,report_key_name="missing_columns_within_train_dataset")
             logging.info(f"Is all required columns present in test df")
-            test_df_columns_status = self.is_required_columns_exists(base_df = base_df,
-            current_df = test_df,
-            report_key_name= "missing_values_within_test_dataset")
+            test_df_columns_status = self.is_required_columns_exists(base_df=base_df,current_df=test_df,report_key_name="missing_columns_within_test_dataset")
 
             if train_df_columns_status:
                 logging.info(f"As all column are available in train df hence detecting data drift")
