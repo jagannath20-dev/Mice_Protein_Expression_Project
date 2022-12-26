@@ -37,6 +37,9 @@ class DataIngestion:
 
             #Replace Null Values with Nan
             df.replace(to_replace="na",value = np.NAN,inplace = True)
+
+           
+
             
             # Save data in feature Store
 

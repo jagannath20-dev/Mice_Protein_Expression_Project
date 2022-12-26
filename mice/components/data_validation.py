@@ -8,6 +8,7 @@ import os, sys
 from scipy.stats import ks_2samp
 from typing import Optional
 from mice.config import TARGET_COLUMN
+from sklearn.preprocessing import LabelEncoder
 
 
 class DataValidation:
@@ -38,7 +39,13 @@ class DataValidation:
         """
 
         try:
+            
             threshold = self.data_validation_config.missing_threshold
+            df['Genotype']=df['Genotype'].map({'Control':0, 'Ts65Dn':1})
+            df['Treatment']=df['Treatment'].map({'Saline':0, 'Memantine':1})
+            df['Behavior']=df['Behavior'].map({'C/S':0, 'S/C':1 })
+            lblEn = LabelEncoder()
+            df['class'] =lblEn.fit_transform(df['class']) 
             null_report = df.isna().sum()/df.shape[0]
             # Selecting Column name which contains null
             logging.info(f"Selecting Column names which contains null more than {threshold}")
@@ -56,7 +63,10 @@ class DataValidation:
         except Exception as e:
             raise MiceException(e,sys)
 
-    def is_required_columns_exists(self,base_df:pd.DataFrame,current_df:pd.DataFrame,report_key_name:str)->bool:
+
+    
+
+    def is_required_columns_exists(self,base_df:pd.DataFrame,current_df:pd.DataFrame,report_key_name:str):
 
         try:
             base_columns = base_df.columns
@@ -88,6 +98,7 @@ class DataValidation:
 
             for base_column in base_columns:
                 base_data,current_data = base_df[base_column],current_df[base_column]
+            
                 # Null Hypothesis is that both column data drawn from same distribution
 
                 logging.info(f"Hypothesis is {base_column} : {base_data.dtype}, {current_data.dtype} ")
@@ -112,6 +123,7 @@ class DataValidation:
         try:
             logging.info(f"Reading base dataframe")
             base_df = pd.read_csv(self.data_validation_config.base_file_path)
+            base_df = base_df.drop(columns=["MouseID"])
             base_df.replace({"na" :np.NAN},inplace = True)
             logging.info(f"Replace na value in base df")
             logging.info(f"Drop null values columns from base df")
@@ -147,7 +159,7 @@ class DataValidation:
                 self.data_drift(base_df=base_df, current_df=test_df,report_key_name="data_drift_within_test_dataset")
 
             # Write the report
-            logging.info("Write reprt in yaml file")
+            logging.info("Write report in yaml file")
             utils.write_yaml_file(file_path=self.data_validation_config.report_file_path,
             data=self.validation_error)
 

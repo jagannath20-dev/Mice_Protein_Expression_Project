@@ -6,6 +6,7 @@ import os, sys
 import yaml
 import numpy as np
 import dill
+from sklearn.preprocessing import LabelEncoder
 
 def get_collection_as_dataframe(database_name:str,collection_name:str):
     """
@@ -21,10 +22,11 @@ def get_collection_as_dataframe(database_name:str,collection_name:str):
         logging.info(f"Reading data from database: {database_name} and collection {collection_name}")
         df = pd.DataFrame(list(mongo_client[database_name][collection_name].find()))
         logging.info(f"Found columns: {df.columns}")
-
-        if "_id" in df.columns:
-            logging.info(f"Dropping column: _id ")
-            df = df.drop("_id",axis = 1)
+        
+    
+        if  "_id" in df.columns:
+            logging.info(f"Dropping columns: [_id,MouseID]")
+            df = df.drop(columns = ["_id","MouseID"])
             logging.info(f"Row and Columns in df: {df.shape}")
         return df
 
@@ -41,11 +43,15 @@ def write_yaml_file(file_path,data:dict):
         raise MiceException(e,sys)
 
 
+    except Exception as e:
+        raise MiceException(e, sys)
+
+
 def convert_columns_float(df:pd.DataFrame,exclude_columns:list)->pd.DataFrame:
     try:
         for column in df.columns:
             if column not in exclude_columns:
-                df[column]=df[column].astype('string')
+                df[column]=df[column].astype('float')
         return df
     except Exception as e:
         raise MiceException(e,sys)
