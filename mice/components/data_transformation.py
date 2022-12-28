@@ -9,10 +9,14 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
 from imblearn.combine import SMOTETomek
-from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from mice.config import TARGET_COLUMN
 from typing import Optional
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.impute import KNNImputer
+
+
 
 
 class DataTransformation:
@@ -34,11 +38,13 @@ class DataTransformation:
     def get_data_transformer_object(cls) -> Pipeline:
 
         try:
-            simple_imputer = SimpleImputer(strategy='constant',fill_value = 0)
-            standar_scaler = StandardScaler()
+            imputer=KNNImputer(n_neighbors=3, weights='uniform',missing_values=np.NAN)
+            min_max_scaler = MinMaxScaler()
+            standard_scaler = StandardScaler()
             pipeline = Pipeline(steps=[
-                ('Imputer',simple_imputer),
-                ('StandardScaler',standar_scaler)
+                ('Imputer',imputer),
+                ('Min_Max_scaler',min_max_scaler),
+                ('StandardScaler',standard_scaler)
             ])
             return pipeline
         except Exception as e:
@@ -122,7 +128,7 @@ class DataTransformation:
             
             data_transformation_artifact = artifact_entity.DataTransformationArtifact(
                 transform_object_path=self.data_transformation_config.transform_object_path,
-                transfromed_train_path=self.data_transformation_config.transformed_train_path,
+                transformed_train_path=self.data_transformation_config.transformed_train_path,
                 transformed_test_path = self.data_transformation_config.transformed_test_path,
                 target_encoder_path= self.data_transformation_config.target_encoder_path
             )

@@ -2,7 +2,6 @@ from mice.pipeline.training_pipeline import start_training_pipeline
 from mice.pipeline.batch_prediction import start_batch_prediction
 
 file_path="/config/workspace/mïce.csv"
-
 print(__name__)
 if __name__=="__main__":
      try:

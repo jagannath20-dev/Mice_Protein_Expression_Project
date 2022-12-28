@@ -16,14 +16,14 @@ class  EnvironmentVariable:
 
 
 TARGET_COLUMN_MAPPING = {
-    "c-CS-m":1,
+    "c-CS-m":0,
     "c-SC-m" : 2,
-    "c-CS-s" : 3,
-    "c-SC-s" : 4, 
-    "t-CS-m" : 5, 
+    "c-CS-s" : 1,
+    "c-SC-s" : 3, 
+    "t-CS-m" : 4, 
     "t-SC-m" : 6,
-    "t-CS-s" : 7, 
-    "t-SC-s" : 8
+    "t-CS-s" : 5, 
+    "t-SC-s" : 7
 }
 
 
