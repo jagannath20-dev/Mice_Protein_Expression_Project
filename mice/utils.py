@@ -91,7 +91,7 @@ def save_numpy_array_data(file_path : str, array : np.array):
         with open(file_path, "wb") as file_obj:
             np.save(file_obj, array)
     except Exception as e:
-        raise SensorException(e, sys) from e
+        raise MiceException(e, sys) from e
 def load_numpy_array_data(file_path: str) -> np.array:
     """
     load numpy array data from file

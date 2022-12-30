@@ -7,6 +7,8 @@ from sklearn.metrics import f1_score
 import pandas  as pd
 import sys,os
 from mice.config import TARGET_COLUMN
+from sklearn.preprocessing import LabelEncoder
+
 
 
 class ModelEvaluation:
@@ -55,6 +57,8 @@ class ModelEvaluation:
             transformer = load_object(file_path=transformer_path)
             model = load_object(file_path=model_path)
             target_encoder = load_object(file_path=target_encoder_path)
+            label_encoder = LabelEncoder()
+
             
 
             logging.info("Currently trained model objects")
@@ -66,15 +70,23 @@ class ModelEvaluation:
 
 
             test_df = pd.read_csv(self.data_ingestion_artifact.test_file_path)
+            test_df['class'] =label_encoder.fit_transform(test_df['class'])
+            test_df['Genotype']=test_df['Genotype'].map({'Control':0, 'Ts65Dn':1})
+            test_df['Treatment']=test_df['Treatment'].map({'Saline':0, 'Memantine':1})
+            test_df['Behavior']=test_df['Behavior'].map({'C/S':0, 'S/C':1 })
+
             target_df = test_df[TARGET_COLUMN]
+            
             y_true =target_encoder.transform(target_df)
             # accuracy using previous trained model
             
             input_feature_name = list(transformer.feature_names_in_)
+            
             input_arr =transformer.transform(test_df[input_feature_name])
+            
             y_pred = model.predict(input_arr)
-            print(f"Prediction using previous model: {target_encoder.inverse_transform(y_pred[:5])}")
-            previous_model_score = f1_score(y_true=y_true, y_pred=y_pred)
+            print(f"Prediction using previous model: {(y_pred)}")
+            previous_model_score = f1_score(y_true=y_true, y_pred=y_pred,average ="micro")
             logging.info(f"Accuracy using previous trained model: {previous_model_score}")
            
             # accuracy using current trained model
@@ -82,8 +94,10 @@ class ModelEvaluation:
             input_arr =current_transformer.transform(test_df[input_feature_name])
             y_pred = current_model.predict(input_arr)
             y_true =current_target_encoder.transform(target_df)
-            print(f"Prediction using trained model: {current_target_encoder.inverse_transform(y_pred[:5])}")
-            current_model_score = f1_score(y_true=y_true, y_pred=y_pred)
+
+            print(f"Prediction using trained model: {(y_pred)}")
+
+            current_model_score = f1_score(y_true=y_true, y_pred=y_pred,average = "micro")
             logging.info(f"Accuracy using current trained model: {current_model_score}")
             if current_model_score<=previous_model_score:
                 logging.info(f"Current trained model is not better than previous model")

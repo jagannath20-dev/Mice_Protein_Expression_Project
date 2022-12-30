@@ -57,4 +57,4 @@ def start_training_pipeline():
 
       model_pusher_artifact = model_pusher.initiate_model_pusher()
     except Exception as e:
-      raise SensorException(e, sys)  
+      raise MiceException(e, sys)  
